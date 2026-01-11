@@ -103,7 +103,7 @@ if st.session_state.page == "Login_Page":
     st.markdown(
         """
         <div style="text-align:center; margin-top:100px;">
-            <h1>TWG | TOTALLY WIRELESS GROUP</h1>
+            <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
             <h2>Accessory Bonus Dashboard Login</h2>
         </div>
         """,
