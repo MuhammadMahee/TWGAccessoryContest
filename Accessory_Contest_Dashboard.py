@@ -18,7 +18,7 @@ THIS_MONTH_LABEL = today.strftime("%b-%y")
 
 
 # -------------------- FILE PATHS --------------------
-CODES_FILE = r"C:\Users\Administrator\OneDrive\Accessory_Contest_Dashboard\IDM_User_Codes.xlsx"
+CODES_FILE = "IDM_User_Codes.xlsx"
 DATA_FILE = "Accessory_Contest.csv"
 ADMIN_USERS = ["Admin"]  # Use exact case as in your codes file
 
