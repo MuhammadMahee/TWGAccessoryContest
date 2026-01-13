@@ -6,7 +6,7 @@ CODES_FILE = "IDM_User_Codes.xlsx"
 
 REPORTS = {
     "Accessory Dashboard": "https://twgaccbonus.streamlit.app/",
-    # Add more reports here later
+    # Add more reports here later if needed
 }
 
 # ---------------- PAGE CONFIG ----------------
@@ -77,7 +77,7 @@ else:
 
     if st.button("Open Report"):
         base_url = REPORTS[selected_report]
-        final_url = f"{base_url}&user={st.session_state.username}"
+        final_url = f"{base_url}?user={st.session_state.username}"  # FIXED: use ?user=
         st.markdown(
             f"<meta http-equiv='refresh' content='0; url={final_url}'>",
             unsafe_allow_html=True
