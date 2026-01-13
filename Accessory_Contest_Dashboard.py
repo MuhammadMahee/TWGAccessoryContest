@@ -2,100 +2,118 @@ import streamlit as st
 import pandas as pd
 from datetime import date, datetime
 
-# -------------------- DEFAULT MONTH LOGIC --------------------
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(page_title="Accessory Contest Dashboard", layout="wide")
+
+# ---------------- QUERY PARAMS ----------------
+qp = st.query_params
+username = qp.get("user", "Admin")
+page = qp.get("page", "Home Page")
+
+# ---------------- DATE LOGIC ----------------
 today = datetime.today()
 THIS_MONTH_START = date(today.year, today.month, 1)
 NEXT_MONTH_START = date(today.year + (today.month // 12), ((today.month % 12) + 1), 1)
 THIS_MONTH_END = NEXT_MONTH_START - pd.Timedelta(days=1)
 THIS_MONTH_LABEL = today.strftime("%b-%y")
 
-# -------------------- FILE PATHS --------------------
+# ---------------- FILE ----------------
 DATA_FILE = "Accessory_Contest.csv"
-ADMIN_USERS = ["Admin"]  # Show all data if Admin
 
-# -------------------- PAGE CONFIG --------------------
-st.set_page_config(page_title="Accessory Contest Dashboard", layout="wide")
-
-# -------------------- LOAD DATA --------------------
+# ---------------- LOAD DATA ----------------
 df = pd.read_csv(DATA_FILE)
 df["adddate"] = pd.to_datetime(df["adddate"], errors="coerce").dt.date
-df = df[[
-    "adddate", "marketid", "custno", "company", "item", "itmdesc", "qty",
-    "Accessory", "minprice", "Cost", "discount", "Profit",
-    "adduser", "Fullname", "invno", "state"
-]]
 
-# -------------------- GET USERNAME AND PAGE FROM QUERY PARAMS --------------------
-query_params = st.query_params
-username = query_params.get("user", ["Admin"])[0]
-page = query_params.get("page", ["Home Page"])[0]
+df = df[
+    [
+        "adddate", "marketid", "custno", "company", "item", "itmdesc",
+        "qty", "Accessory", "minprice", "Cost", "discount",
+        "Profit", "adduser", "Fullname", "invno", "state"
+    ]
+]
 
-# -------------------- HELPERS --------------------
+# ---------------- FILTER BY USER ----------------
 def get_user_df():
-    if username in ADMIN_USERS:
+    if username == "Admin":
         return df.copy()
     return df[df["adduser"] == username].copy()
 
-def go_to_page(page_name):
-    st.experimental_set_query_params(page=page_name, user=username)
-    st.experimental_rerun()
-
-# -------------------- SIDEBAR --------------------
+# ---------------- SIDEBAR ----------------
 with st.sidebar:
     st.markdown("### Logged in as")
     st.markdown(f"**{username}**")
     st.divider()
 
-    for btn in ["Home Page", "Summary", "Detailed"]:
-        if st.button(btn):
-            st.experimental_set_query_params(page=btn, user=username)
-            st.experimental_rerun()
+    if st.button("Home Page"):
+        st.query_params.clear()
+        st.query_params["user"] = username
+        st.query_params["page"] = "Home Page"
+
+    if st.button("Summary"):
+        st.query_params.clear()
+        st.query_params["user"] = username
+        st.query_params["page"] = "Summary"
+
+    if st.button("Detailed"):
+        st.query_params.clear()
+        st.query_params["user"] = username
+        st.query_params["page"] = "Detailed"
 
 # ====================================================
 # ==================== HOME PAGE =====================
 # ====================================================
 if page == "Home Page":
+
     st.markdown(
         f"""
-        <div style="text-align:left;">
-            <h1>TWG | Totally Wireless Group</h1>
-            <h2>Welcome to Accessory Bonus Dashboard!</h2>
-            <h3><strong>Top 5 Employees by Bonus – {THIS_MONTH_LABEL}</strong></h3>
-        </div>
+        <h1>TWG | Totally Wireless Group</h1>
+        <h2>Accessory Bonus Dashboard</h2>
+        <h3>Top 5 Employees — {THIS_MONTH_LABEL}</h3>
         """,
         unsafe_allow_html=True
     )
 
     home_df = get_user_df()
-    home_df = home_df[(home_df["adddate"] >= THIS_MONTH_START) & (home_df["adddate"] <= THIS_MONTH_END)]
+    home_df = home_df[
+        (home_df["adddate"] >= THIS_MONTH_START)
+        & (home_df["adddate"] <= THIS_MONTH_END)
+    ]
 
     if home_df.empty:
-        st.info("No data available to calculate bonuses.")
+        st.info("No data available.")
     else:
         summary = (
-            home_df.groupby(["adduser", "Fullname"], as_index=False)
-            .agg(Total_Accessory=("Accessory", "sum"),
-                 Total_Profit=("Profit", "sum"))
+            home_df
+            .groupby(["adduser", "Fullname"], as_index=False)
+            .agg(
+                Total_Accessory=("Accessory", "sum"),
+                Total_Profit=("Profit", "sum")
+            )
         )
 
         def calculate_bonus(row):
             acc = row["Total_Accessory"]
             profit = row["Total_Profit"]
-            if acc <= 2999: pct = 0.08
-            elif acc <= 5999: pct = 0.10
-            elif acc <= 9999: pct = 0.15
-            else: pct = 0.17
+
+            if acc <= 2999:
+                pct = 0.08
+            elif acc <= 5999:
+                pct = 0.10
+            elif acc <= 9999:
+                pct = 0.15
+            else:
+                pct = 0.17
+
             return round(profit * pct, 2)
 
         summary["Bonus"] = summary.apply(calculate_bonus, axis=1)
-        top5 = summary.sort_values("Bonus", ascending=False).head(5).reset_index(drop=True)
+        top5 = summary.sort_values("Bonus", ascending=False).head(5)
+
         medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
 
-        for idx, row in top5.iterrows():
-            font_size = 35 if idx == 0 else 25
-            font_weight = 800 if idx == 0 else 500
+        for i, row in top5.reset_index(drop=True).iterrows():
             st.markdown(
-                f"<div style='text-align:left; font-size:{font_size}px; font-weight:{font_weight}; margin-bottom:8px;'>{medals[idx]} {row['adduser']} — {row['Fullname']} — ${row['Bonus']:,.2f}</div>",
+                f"<h3>{medals[i]} {row['adduser']} — {row['Fullname']} — ${row['Bonus']:,.2f}</h3>",
                 unsafe_allow_html=True
             )
 
@@ -103,93 +121,36 @@ if page == "Home Page":
 # ==================== SUMMARY =======================
 # ====================================================
 elif page == "Summary":
+
     st.title("Summary")
     summary_df = get_user_df()
 
     if summary_df.empty:
-        st.info("No data available for the selected user.")
+        st.info("No data available.")
     else:
-        fullnames = summary_df["Fullname"].dropna().unique().tolist()
-        selected_name = st.selectbox("Select Fullname", ["All"] + fullnames)
-        if selected_name != "All": summary_df = summary_df[summary_df["Fullname"] == selected_name]
+        start_date, end_date = st.date_input(
+            "Date Range",
+            value=(THIS_MONTH_START, THIS_MONTH_END)
+        )
 
-        ntid = summary_df["adduser"].dropna().unique().tolist()
-        selected_ntid = st.selectbox("Select NTID", ["All"] + ntid)
-        if selected_ntid != "All": summary_df = summary_df[summary_df["adduser"] == selected_ntid]
+        summary_df = summary_df[
+            (summary_df["adddate"] >= start_date)
+            & (summary_df["adddate"] <= end_date)
+        ]
 
-        companies = summary_df["company"].dropna().unique().tolist()
-        selected_company = st.selectbox("Select Company", ["All"] + companies)
-        if selected_company != "All": summary_df = summary_df[summary_df["company"] == selected_company]
-
-        min_date = summary_df["adddate"].min()
-        max_date = summary_df["adddate"].max()
-        if pd.notna(min_date) and pd.notna(max_date):
-            default_start = max(min_date, THIS_MONTH_START)
-            default_end = min(max_date, THIS_MONTH_END)
-            start_date, end_date = st.date_input(
-                "Select Date Range",
-                value=(default_start, default_end),
-                min_value=min_date,
-                max_value=max_date
-            )
-            summary_df = summary_df[(summary_df["adddate"] >= start_date) & (summary_df["adddate"] <= end_date)]
-
-        total_qty = summary_df["qty"].sum()
-        total_accessory = summary_df["Accessory"].sum()
-        total_profit = summary_df["Profit"].sum()
-
-        if total_accessory <= 2999: tier, bonus_pct = "Tier 1", 0.08
-        elif total_accessory <= 5999: tier, bonus_pct = "Tier 2", 0.10
-        elif total_accessory <= 9999: tier, bonus_pct = "Tier 3", 0.15
-        else: tier, bonus_pct = "Tier 4", 0.17
-
-        bonus = total_profit * bonus_pct
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Total Qty", total_qty)
-        c2.metric("Total Accessory", f"${total_accessory:,.2f}")
-        c3.metric("Total Profit", f"${total_profit:,.2f}")
-
-        c4, c5, c6 = st.columns(3)
-        c4.metric("Tier", tier)
-        c5.metric("Bonus %", f"{bonus_pct*100:.0f}%")
-        c6.metric("Bonus", f"${bonus:,.2f}")
+        st.metric("Total Qty", summary_df["qty"].sum())
+        st.metric("Total Accessory", f"${summary_df['Accessory'].sum():,.2f}")
+        st.metric("Total Profit", f"${summary_df['Profit'].sum():,.2f}")
 
 # ====================================================
 # ==================== DETAILED ======================
 # ====================================================
 elif page == "Detailed":
+
     st.title("Detailed Data")
-    filtered_df = get_user_df()
-    columns_to_display = df.columns
-    filtered_df = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
+    detailed_df = get_user_df()
 
-    if filtered_df.empty:
-        st.info("No data available for the selected user.")
+    if detailed_df.empty:
+        st.info("No data available.")
     else:
-        fullnames = filtered_df["Fullname"].dropna().unique().tolist()
-        selected_name = st.selectbox("Select Fullname", ["All"] + fullnames)
-        if selected_name != "All": filtered_df = filtered_df[filtered_df["Fullname"] == selected_name]
-
-        ntid = filtered_df["adduser"].dropna().unique().tolist()
-        selected_ntid = st.selectbox("Select NTID", ["All"] + ntid)
-        if selected_ntid != "All": filtered_df = filtered_df[filtered_df["adduser"] == selected_ntid]
-
-        stores = filtered_df["company"].dropna().unique().tolist()
-        selected_store = st.selectbox("Select Store", ["All"] + stores)
-        if selected_store != "All": filtered_df = filtered_df[filtered_df["company"] == selected_store]
-
-        min_date = filtered_df["adddate"].min()
-        max_date = filtered_df["adddate"].max()
-        if pd.notna(min_date) and pd.notna(max_date):
-            default_start = max(min_date, THIS_MONTH_START)
-            default_end = min(max_date, THIS_MONTH_END)
-            start_date, end_date = st.date_input(
-                "Select Date Range",
-                value=(default_start, default_end),
-                min_value=min_date,
-                max_value=max_date
-            )
-            filtered_df = filtered_df[(filtered_df["adddate"] >= start_date) & (filtered_df["adddate"] <= end_date)]
-
-        st.dataframe(filtered_df, use_container_width=True)
+        st.dataframe(detailed_df, use_container_width=True)
