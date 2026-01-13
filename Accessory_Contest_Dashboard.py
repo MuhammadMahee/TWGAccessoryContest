@@ -66,21 +66,25 @@ if page == "Home Page":
 
     st.markdown(
         f"""
-        <h1>TWG | Totally Wireless Group</h1>
-        <h2>Accessory Bonus Dashboard</h2>
-        <h3>Top 5 Employees — {THIS_MONTH_LABEL}</h3>
+        <div style="text-align:left;">
+            <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
+            <h2>Welcome to Accessory Bonus Dashboard!</h2>
+            <h3><strong>Top 5 Employees by Bonus – {THIS_MONTH_LABEL}</strong></h3>
+            <h3><strong></strong></h3>
+        </div>
         """,
         unsafe_allow_html=True
     )
 
     home_df = get_user_df()
+
     home_df = home_df[
-        (home_df["adddate"] >= THIS_MONTH_START)
-        & (home_df["adddate"] <= THIS_MONTH_END)
-    ]
+    (home_df["adddate"] >= THIS_MONTH_START) &
+    (home_df["adddate"] <= THIS_MONTH_END)
+]
 
     if home_df.empty:
-        st.info("No data available.")
+        st.info("No data available to calculate bonuses.")
     else:
         summary = (
             home_df
@@ -107,15 +111,32 @@ if page == "Home Page":
             return round(profit * pct, 2)
 
         summary["Bonus"] = summary.apply(calculate_bonus, axis=1)
-        top5 = summary.sort_values("Bonus", ascending=False).head(5)
+
+        top5 = summary.sort_values("Bonus", ascending=False).head(5).reset_index(drop=True)
 
         medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
 
-        for i, row in top5.reset_index(drop=True).iterrows():
-            st.markdown(
-                f"<h3>{medals[i]} {row['adduser']} — {row['Fullname']} — ${row['Bonus']:,.2f}</h3>",
-                unsafe_allow_html=True
-            )
+        for idx, row in top5.iterrows():
+            if idx == 0:
+                # 1st place – BIG & BOLD
+                st.markdown(
+                    f"""
+                    <div style="text-align:left; font-size:35px; font-weight:800; margin-bottom:12px;">
+                        {medals[idx]} {row['adduser']} — {row['Fullname']} — ${row['Bonus']:,.2f}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+            else:
+                # Others – normal size
+                st.markdown(
+                    f"""
+                    <div style="text-align:left; font-size:25px; margin-bottom:8px;">
+                        {medals[idx]} {row['adduser']} — {row['Fullname']} — ${row['Bonus']:,.2f}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
 # ====================================================
 # ==================== SUMMARY =======================
