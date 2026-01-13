@@ -151,6 +151,11 @@ elif st.session_state.page == "Summary":
         col2.metric("Total Accessory", f"${total_acc:,.2f}")
         col3.metric("Total Profit", f"${total_profit:,.2f}")
 
+        c4, c5, c6 = st.columns(3)
+        c4.metric("Tier", tier)
+        c5.metric("Bonus %", f"{bonus_pct*100:.0f}%")
+        c6.metric("Monthly Bonus", f"${monthly_bonus:,.2f}")
+
 # ====================================================
 # ==================== DETAILED ======================
 # ====================================================
