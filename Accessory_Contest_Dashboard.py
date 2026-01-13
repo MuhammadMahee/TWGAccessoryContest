@@ -44,13 +44,9 @@ def get_user_df():
         return df.copy()
     return df[df["adduser"] == username].copy()
 
-def go_to_page(page_name):
-    st.query_params["page"] = page_name
-    st.rerun()
-
 # ---------------- SESSION ----------------
 if "page" not in st.session_state:
-    st.session_state.page = st.query_params.get("page", ["Home Page"])[0]
+    st.session_state.page = "Home Page"
 
 # ---------------- SIDEBAR ----------------
 with st.sidebar:
@@ -58,9 +54,14 @@ with st.sidebar:
     st.markdown(f"**{username}**")
     st.divider()
 
-    for btn in ["Home Page", "Summary", "Detailed"]:
-        if st.button(btn):
-            go_to_page(btn)
+    if st.button("Home Page"):
+        st.session_state.page = "Home Page"
+
+    if st.button("Summary"):
+        st.session_state.page = "Summary"
+
+    if st.button("Detailed"):
+        st.session_state.page = "Detailed"
 
 # ====================================================
 # ==================== HOME PAGE =====================
@@ -145,9 +146,10 @@ elif st.session_state.page == "Summary":
         total_acc = summary_df["Accessory"].sum()
         total_profit = summary_df["Profit"].sum()
 
-        st.metric("Total Qty", total_qty)
-        st.metric("Total Accessory", f"${total_acc:,.2f}")
-        st.metric("Total Profit", f"${total_profit:,.2f}")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Qty", total_qty)
+        col2.metric("Total Accessory", f"${total_acc:,.2f}")
+        col3.metric("Total Profit", f"${total_profit:,.2f}")
 
 # ====================================================
 # ==================== DETAILED ======================
