@@ -45,19 +45,22 @@ with st.sidebar:
     st.divider()
 
     if st.button("Home Page"):
-        st.query_params.clear()
-        st.query_params["user"] = username
-        st.query_params["page"] = "Home Page"
+        st.query_params.update({
+            "user": username,
+            "page": "Home Page"
+        })
 
     if st.button("Summary"):
-        st.query_params.clear()
-        st.query_params["user"] = username
-        st.query_params["page"] = "Summary"
+        st.query_params.update({
+            "user": username,
+            "page": "Summary"
+        })
 
     if st.button("Detailed"):
-        st.query_params.clear()
-        st.query_params["user"] = username
-        st.query_params["page"] = "Detailed"
+        st.query_params.update({
+            "user": username,
+            "page": "Detailed"
+        })
 
 # ====================================================
 # ==================== HOME PAGE =====================
