@@ -123,24 +123,73 @@ if page == "Home Page":
 elif page == "Summary":
 
     st.title("Summary")
+
     summary_df = get_user_df()
 
     if summary_df.empty:
-        st.info("No data available.")
+        st.info("No data available for the selected user.")
     else:
-        start_date, end_date = st.date_input(
-            "Date Range",
-            value=(THIS_MONTH_START, THIS_MONTH_END)
-        )
+        fullnames = summary_df["Fullname"].dropna().unique().tolist()
+        selected_name = st.selectbox("Select Fullname", ["All"] + fullnames)
 
-        summary_df = summary_df[
-            (summary_df["adddate"] >= start_date)
-            & (summary_df["adddate"] <= end_date)
-        ]
+        if selected_name != "All":
+            summary_df = summary_df[summary_df["Fullname"] == selected_name]
 
-        st.metric("Total Qty", summary_df["qty"].sum())
-        st.metric("Total Accessory", f"${summary_df['Accessory'].sum():,.2f}")
-        st.metric("Total Profit", f"${summary_df['Profit'].sum():,.2f}")
+        ntid = summary_df["adduser"].dropna().unique().tolist()
+        selected_ntid = st.selectbox("Select NTID", ["All"] + ntid)
+
+        if selected_ntid != "All":
+            summary_df = summary_df[summary_df["adduser"] == selected_ntid]
+
+        companies = summary_df["company"].dropna().unique().tolist()
+        selected_company = st.selectbox("Select Company", ["All"] + companies)
+
+        if selected_company != "All":
+            summary_df = summary_df[summary_df["company"] == selected_company]
+
+        min_date = summary_df["adddate"].min()
+        max_date = summary_df["adddate"].max()
+
+        if pd.notna(min_date) and pd.notna(max_date):
+            default_start = max(min_date, THIS_MONTH_START)
+            default_end = min(max_date, THIS_MONTH_END)
+
+            start_date, end_date = st.date_input(
+                "Select Date Range",
+                value=(default_start, default_end),
+                min_value=min_date,
+                max_value=max_date
+            )
+
+            summary_df = summary_df[
+                (summary_df["adddate"] >= start_date) &
+                (summary_df["adddate"] <= end_date)
+            ]
+
+        total_qty = summary_df["qty"].sum()
+        total_accessory = summary_df["Accessory"].sum()
+        total_profit = summary_df["Profit"].sum()
+
+        if total_accessory <= 2999:
+            tier, bonus_pct = "Tier 1", 0.08
+        elif total_accessory <= 5999:
+            tier, bonus_pct = "Tier 2", 0.10
+        elif total_accessory <= 9999:
+            tier, bonus_pct = "Tier 3", 0.15
+        else:
+            tier, bonus_pct = "Tier 4", 0.17
+
+        bonus = total_profit * bonus_pct
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Total Qty", total_qty)
+        c2.metric("Total Accessory", f"${total_accessory:,.2f}")
+        c3.metric("Total Profit", f"${total_profit:,.2f}")
+
+        c4, c5, c6 = st.columns(3)
+        c4.metric("Tier", tier)
+        c5.metric("Bonus %", f"{bonus_pct*100:.0f}%")
+        c6.metric("Bonus", f"${bonus:,.2f}")
 
 # ====================================================
 # ==================== DETAILED ======================
@@ -148,9 +197,51 @@ elif page == "Summary":
 elif page == "Detailed":
 
     st.title("Detailed Data")
-    detailed_df = get_user_df()
 
-    if detailed_df.empty:
-        st.info("No data available.")
+    filtered_df = get_user_df()
+
+    # Keep only selected columns
+    columns_to_display = df.columns
+    filtered_df = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
+
+    if filtered_df.empty:
+        st.info("No data available for the selected user.")
     else:
-        st.dataframe(detailed_df, use_container_width=True)
+        fullnames = filtered_df["Fullname"].dropna().unique().tolist()
+        selected_name = st.selectbox("Select Fullname", ["All"] + fullnames)
+
+        if selected_name != "All":
+            filtered_df = filtered_df[filtered_df["Fullname"] == selected_name]
+
+        ntid = filtered_df["adduser"].dropna().unique().tolist()
+        selected_ntid = st.selectbox("Select NTID", ["All"] + ntid)
+
+        if selected_ntid != "All":
+            filtered_df = filtered_df[filtered_df["adduser"] == selected_ntid]
+
+        stores = filtered_df["company"].dropna().unique().tolist()
+        selected_store = st.selectbox("Select Store", ["All"] + stores)
+
+        if selected_store != "All":
+            filtered_df = filtered_df[filtered_df["company"] == selected_store]
+
+        min_date = filtered_df["adddate"].min()
+        max_date = filtered_df["adddate"].max()
+
+        if pd.notna(min_date) and pd.notna(max_date):
+            default_start = max(min_date, THIS_MONTH_START)
+            default_end = min(max_date, THIS_MONTH_END)
+
+            start_date, end_date = st.date_input(
+                "Select Date Range",
+                value=(default_start, default_end),
+                min_value=min_date,
+                max_value=max_date
+            )
+
+            filtered_df = filtered_df[
+                (filtered_df["adddate"] >= start_date) &
+                (filtered_df["adddate"] <= end_date)
+            ]
+
+        st.dataframe(filtered_df, use_container_width=True)
