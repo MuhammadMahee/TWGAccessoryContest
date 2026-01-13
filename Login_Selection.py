@@ -5,7 +5,7 @@ import pandas as pd
 CODES_FILE = "IDM_User_Codes.xlsx"
 
 REPORTS = {
-    "Accessory Dashboard": "https://twgaccessorydashboard.streamlit.app/?page=Home+Page",
+    "Accessory Dashboard": "https://twgaccbonus.streamlit.app/?page=Home+Page",
     # Add more reports here later
 }
 
