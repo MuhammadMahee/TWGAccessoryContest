@@ -204,7 +204,7 @@ elif page == "Summary":
             summary_df = summary_df[summary_df["adduser"] == selected_ntid]
 
         companies = summary_df["company"].dropna().unique().tolist()
-        selected_company = st.selectbox("Select Company", ["All"] + companies)
+        selected_company = st.selectbox("Select Store", ["All"] + companies)
 
         if selected_company != "All":
             summary_df = summary_df[summary_df["company"] == selected_company]
