@@ -100,7 +100,7 @@ else:
     st.success("Login successful")
 
     st.link_button(
-        "Open Accessory Dashboard",
+        "Open Report",
         final_url,
         use_container_width=True
     )
