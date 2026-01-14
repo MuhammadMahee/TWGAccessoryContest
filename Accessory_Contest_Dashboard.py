@@ -322,18 +322,18 @@ if export_data:
             ws.cell(row=row_num, column=col_num, value=row_data[header])
             ws.column_dimensions[get_column_letter(col_num)].width = max(15, len(header)+2)
 
-# Save to bytes buffer
-output = io.BytesIO()
-wb.save(output)
-output.seek(0)
+    # Save to bytes buffer
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
 
-# Streamlit download button
-st.download_button(
-    label="Download Summary",
-    data=output,
-    file_name=f"Accessory_Summary_{THIS_MONTH_LABEL}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    # Streamlit download button
+    st.download_button(
+        label="Download Summary",
+        data=output,
+        file_name=f"Accessory_Summary_{THIS_MONTH_LABEL}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 # ====================================================
 # ==================== DETAILED ======================
