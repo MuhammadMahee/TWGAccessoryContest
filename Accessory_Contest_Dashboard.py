@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date, datetime
 import hmac
 import hashlib
+import io
 import time
 
 LOGOUT_URL = "https://totallywirelessgroup.streamlit.app/"
@@ -224,7 +225,7 @@ elif page == "Summary":
             )
 
             summary_df = summary_df[
-                (summary_df["Date"] >= start_date) &
+                (summary_df["Date"] >= start_date) & 
                 (summary_df["Date"] <= end_date)
             ]
 
@@ -243,6 +244,7 @@ elif page == "Summary":
 
         bonus = total_profit * bonus_pct
 
+        # ---------------- METRICS ----------------
         c1, c2, c3 = st.columns(3)
         c1.metric("Total Qty", total_qty)
         c2.metric("Total Accessory", f"${total_accessory:,.2f}")
@@ -252,6 +254,35 @@ elif page == "Summary":
         c4.metric("Tier", tier)
         c5.metric("Bonus %", f"{bonus_pct*100:.0f}%")
         c6.metric("Bonus", f"${bonus:,.2f}")
+
+        # ---------------- DOWNLOAD BUTTON ----------------
+        # Prepare the DataFrame to export
+        export_df = pd.DataFrame({
+            "marketid": summary_df["marketid"],
+            "company": summary_df["company"],
+            "adduser": summary_df["adduser"],
+            "Fullname": summary_df["Fullname"],
+            "Total Qty": total_qty,
+            "Total Accessory": total_accessory,
+            "Total Profit": total_profit,
+            "Tier": tier,
+            "Bonus %": f"{bonus_pct*100:.0f}%",
+            "Bonus": bonus
+        }, index=[0])  # index=[0] to create a single-row DataFrame for metrics
+
+        # Add button for downloading
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            export_df.to_excel(writer, index=False, sheet_name="Summary")
+            writer.save()
+            processed_data = output.getvalue()
+
+        st.download_button(
+            label="Download Summary",
+            data=processed_data,
+            file_name=f"Accessory_Summary_{THIS_MONTH_LABEL}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 # ====================================================
 # ==================== DETAILED ======================
