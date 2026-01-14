@@ -114,7 +114,7 @@ if page == "Home Page":
         unsafe_allow_html=True
     )
 
-    home_df = get_user_df()
+    home_df = df.copy()
 
     home_df = home_df[
     (home_df["adddate"] >= THIS_MONTH_START) &
