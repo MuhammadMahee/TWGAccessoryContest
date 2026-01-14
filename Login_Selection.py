@@ -58,7 +58,7 @@ if not st.session_state.logged_in:
         unsafe_allow_html=True
     )
 
-    selected_user = st.selectbox("Enter Your NTID", usernames)
+    selected_user = st.selectbox("Select Your NTID", usernames)
     entered_code = st.text_input("Enter Password", type="password")
 
     if st.button("Login"):
