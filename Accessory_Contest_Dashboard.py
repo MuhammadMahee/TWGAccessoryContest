@@ -262,10 +262,6 @@ elif page == "Detailed":
 
     filtered_df = get_user_df()
 
-    # Keep only selected columns
-    columns_to_display = df.columns
-    filtered_df = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
-
     if filtered_df.empty:
         st.info("No data available for the selected user.")
     else:
@@ -306,10 +302,15 @@ elif page == "Detailed":
                 (filtered_df["Date"] <= end_date)
             ]
 
-        # Format adddate column for display
-        if "adddate" in filtered_df.columns:
-            filtered_df = filtered_df.copy()
-            filtered_df["adddate"] = pd.to_datetime(filtered_df["adddate"])
-            filtered_df["adddate"] = filtered_df["adddate"].dt.strftime("%m/%d/%Y %I:%M %p")
+        # Keep all columns except "Date" for display
+        columns_to_display = [col for col in filtered_df.columns if col != "Date"]
+        filtered_df_display = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
 
-        st.dataframe(filtered_df, use_container_width=True)
+        # Format adddate column for display
+        if "adddate" in filtered_df_display.columns:
+            filtered_df_display = filtered_df_display.copy()
+            filtered_df_display["adddate"] = pd.to_datetime(filtered_df_display["adddate"])
+            filtered_df_display["adddate"] = filtered_df_display["adddate"].dt.strftime("%m/%d/%Y %I:%M %p")
+
+        # Display the DataFrame
+        st.dataframe(filtered_df_display, use_container_width=True)
