@@ -263,7 +263,11 @@ elif page == "Detailed":
     filtered_df = get_user_df()
 
     # Keep only selected columns
-    columns_to_display = df.columns
+    columns_to_display = df[[
+        "adddate", "marketid", "custno", "company", "item", "itmdesc",
+        "qty", "Accessory", "minprice", "Cost", "discount",
+        "Profit", "adduser", "Fullname", "invno", "state"
+    ]]
     filtered_df = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
 
     if filtered_df.empty:
