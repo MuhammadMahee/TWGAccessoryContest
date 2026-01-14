@@ -22,7 +22,7 @@ CODES_FILE = "IDM_User_Codes.xlsx"
 
 REPORTS = {
     "Accessory Dashboard": "https://twgaccbonus.streamlit.app/",
-    "WhatsApp": "https://web.whatsapp.com/",
+    "More Reports Coming Soon!": "",
     # Add more reports here later if needed
 }
 
