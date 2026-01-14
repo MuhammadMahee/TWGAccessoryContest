@@ -74,7 +74,7 @@ df = df[
     [
         "adddate", "marketid", "custno", "company", "item", "itmdesc",
         "qty", "Accessory", "minprice", "Cost", "discount",
-        "Profit", "adduser", "Fullname", "invno", "state"
+        "Profit", "adduser", "Fullname", "invno", "state", "Date"
     ]
 ]
 
