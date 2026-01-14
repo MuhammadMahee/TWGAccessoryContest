@@ -92,43 +92,35 @@ else:
         list(REPORTS.keys())
     )
 
+
+
     base_url = REPORTS[selected_report]
+    token = generate_token(st.session_state.username)
+    final_url = f"{base_url}?token={token}"
 
-    # Only generate token and link if report URL exists
-    if base_url:
-        token = generate_token(st.session_state.username)
-        final_url = f"{base_url}?token={token}"
+    st.success("Login successful")
 
-        # Open report button in same tab without causing redirect loops
-        st.markdown(
-            f"""
-            <style>
-            .report-btn {{
-                display: block;
-                text-align: center;
-                padding: 0.65rem;
-                background-color: var(--primary-background-color);
-                color: var(--text-color);
-                text-decoration: none;
-                border-radius: 8px;
-                font-weight: 600;
-                border: 1px solid #D3D3D3; /* Light grey border */
-                transition: all 0.2s ease;
-                margin: 0 auto;
-            }}
-            .report-btn:hover {{
-                background-color: var(--secondary-background-color);
-            }}
-            </style>
-            <a href="{final_url}" target="_self" class="report-btn">Open Report</a>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        st.info("Report URL not available yet.")
+    st.markdown(
+        f"""
+        <a href="{final_url}" target="_self"
+        style="
+            display:block;
+            text-align:center;
+            padding:0.75rem;
+            background-color:#FF4B4B;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:600;
+        ">
+            Open Report
+        </a>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.divider()
 
     if st.button("Logout"):
         st.session_state.clear()
-        st.rerun()  # safe rerun after clearing session
+        st.rerun()
