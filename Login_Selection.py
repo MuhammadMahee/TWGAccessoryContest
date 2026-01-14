@@ -3,6 +3,7 @@ import pandas as pd
 import hmac
 import hashlib
 import time
+import streamlit.components.v1 as components
 
 SHARED_SECRET = "TWG_ACCESSORY_BONUS_2026_SECURE"
 
@@ -90,13 +91,19 @@ else:
         list(REPORTS.keys())
     )
 
+
     if st.button("Open Report"):
         base_url = REPORTS[selected_report]
         token = generate_token(st.session_state.username)
         final_url = f"{base_url}?token={token}"
-        st.markdown(
-            f"<meta http-equiv='refresh' content='0; url={final_url}'>",
-            unsafe_allow_html=True
+
+        components.html(
+            f"""
+            <script>
+                window.location.href = "{final_url}";
+            </script>
+            """,
+            height=0
         )
 
     st.divider()
