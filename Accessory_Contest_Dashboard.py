@@ -90,20 +90,30 @@ with st.sidebar:
     st.markdown(f"**{username}**")
     st.divider()
 
-    if st.button("Home Page"):
-        navigate("Home Page")
+    # Navigation buttons using link_button
+    st.link_button(
+        "Home Page",
+        url=f"?page=Home Page",
+        use_container_width=True
+    )
 
-    if st.button("Summary"):
-        navigate("Summary")
+    st.link_button(
+        "Summary",
+        url=f"?page=Summary",
+        use_container_width=True
+    )
 
-    if st.button("Detailed"):
-        navigate("Detailed")
-        
+    st.link_button(
+        "Detailed",
+        url=f"?page=Detailed",
+        use_container_width=True
+    )
+
     st.divider()
 
     # Logout button (same tab redirect)
     st.link_button(
-        "Open Report",
+        "Log Out",
         LOGOUT_URL,
         use_container_width=True
     )
