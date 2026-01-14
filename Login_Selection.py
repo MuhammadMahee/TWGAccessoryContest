@@ -112,7 +112,7 @@ else:
             text-decoration:none;
             border-radius:8px;
             font-weight:600;
-            border:1px solid var(--secondary-background-color);
+            border:1px solid #D3D3D3;  /* Light grey border */
             transition: all 0.2s ease;
         "
         onmouseover="this.style.backgroundColor='var(--secondary-background-color)';"
