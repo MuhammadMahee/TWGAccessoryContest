@@ -107,16 +107,17 @@ else:
             display:block;
             text-align:center;
             padding:0.65rem;
-            background-color:#F0F2F6;
-            color:#262730;
+            background-color: var(--primary-background-color);
+            color: var(--text-color);
             text-decoration:none;
             border-radius:8px;
             font-weight:600;
-            border:1px solid #D1D5DB;
+            border:1px solid var(--secondary-background-color);
+            transition: all 0.2s ease;
         "
-        onmouseover="this.style.backgroundColor='#E6EAF0'"
-        onmouseout="this.style.backgroundColor='#F0F2F6'">
-            Open Report
+        onmouseover="this.style.backgroundColor='var(--secondary-background-color)';"
+        onmouseout="this.style.backgroundColor='var(--primary-background-color)';">
+            Open Accessory Dashboard
         </a>
         """,
         unsafe_allow_html=True
