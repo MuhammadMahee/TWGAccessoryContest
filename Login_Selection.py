@@ -97,14 +97,7 @@ else:
         token = generate_token(st.session_state.username)
         final_url = f"{base_url}?token={token}"
 
-        components.html(
-            f"""
-            <script>
-                window.location.href = "{final_url}";
-            </script>
-            """,
-            height=0
-        )
+        st.link_button("Open Accessory Dashboard", final_url)
 
     st.divider()
 
