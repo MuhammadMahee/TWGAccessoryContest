@@ -92,7 +92,7 @@ else:
     )
 
 
-    if st.button("Open Report"):
+    if st.button(""):
         base_url = REPORTS[selected_report]
         token = generate_token(st.session_state.username)
         final_url = f"{base_url}?token={token}"
