@@ -100,10 +100,23 @@ else:
 
     st.success("Login successful")
 
-    st.link_button(
-        "Open Report",
-        final_url,
-        use_container_width=True
+    st.markdown(
+        f"""
+        <a href="{final_url}" target="_self"
+        style="
+            display:block;
+            text-align:center;
+            padding:0.75rem;
+            background-color:#FF4B4B;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:600;
+        ">
+            Open Report
+        </a>
+        """,
+        unsafe_allow_html=True
     )
 
     st.divider()
