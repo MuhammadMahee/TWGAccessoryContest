@@ -106,14 +106,17 @@ else:
         style="
             display:block;
             text-align:center;
-            padding:0.75rem;
-            background-color:#FF4B4B;
-            color:white;
+            padding:0.65rem;
+            background-color:#F0F2F6;
+            color:#262730;
             text-decoration:none;
             border-radius:8px;
             font-weight:600;
-        ">
-            Open Report
+            border:1px solid #D1D5DB;
+        "
+        onmouseover="this.style.backgroundColor='#E6EAF0'"
+        onmouseout="this.style.backgroundColor='#F0F2F6'">
+            Open Accessory Dashboard
         </a>
         """,
         unsafe_allow_html=True
