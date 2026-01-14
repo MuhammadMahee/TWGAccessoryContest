@@ -68,7 +68,7 @@ DATA_FILE = "Accessory_Contest.csv"
 
 # ---------------- LOAD DATA ----------------
 df = pd.read_csv(DATA_FILE)
-df["adddate"] = pd.to_datetime(df["adddate"], errors="coerce").dt.date
+df["Date"] = pd.to_datetime(df["adddate"], errors="coerce").dt.date
 
 df = df[
     [
@@ -120,8 +120,8 @@ if page == "Home Page":
     home_df = df.copy()
 
     home_df = home_df[
-    (home_df["adddate"] >= THIS_MONTH_START) &
-    (home_df["adddate"] <= THIS_MONTH_END)
+    (home_df["Date"] >= THIS_MONTH_START) &
+    (home_df["Date"] <= THIS_MONTH_END)
 ]
 
     if home_df.empty:
@@ -209,8 +209,8 @@ elif page == "Summary":
         if selected_company != "All":
             summary_df = summary_df[summary_df["company"] == selected_company]
 
-        min_date = summary_df["adddate"].min()
-        max_date = summary_df["adddate"].max()
+        min_date = summary_df["Date"].min()
+        max_date = summary_df["Date"].max()
 
         if pd.notna(min_date) and pd.notna(max_date):
             default_start = max(min_date, THIS_MONTH_START)
@@ -224,8 +224,8 @@ elif page == "Summary":
             )
 
             summary_df = summary_df[
-                (summary_df["adddate"] >= start_date) &
-                (summary_df["adddate"] <= end_date)
+                (summary_df["Date"] >= start_date) &
+                (summary_df["Date"] <= end_date)
             ]
 
         total_qty = summary_df["qty"].sum()
@@ -287,8 +287,8 @@ elif page == "Detailed":
         if selected_store != "All":
             filtered_df = filtered_df[filtered_df["company"] == selected_store]
 
-        min_date = filtered_df["adddate"].min()
-        max_date = filtered_df["adddate"].max()
+        min_date = filtered_df["Date"].min()
+        max_date = filtered_df["Date"].max()
 
         if pd.notna(min_date) and pd.notna(max_date):
             default_start = max(min_date, THIS_MONTH_START)
@@ -302,8 +302,8 @@ elif page == "Detailed":
             )
 
             filtered_df = filtered_df[
-                (filtered_df["adddate"] >= start_date) &
-                (filtered_df["adddate"] <= end_date)
+                (filtered_df["Date"] >= start_date) &
+                (filtered_df["Date"] <= end_date)
             ]
 
         # Format adddate column for display
