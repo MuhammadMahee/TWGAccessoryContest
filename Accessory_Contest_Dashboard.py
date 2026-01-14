@@ -89,22 +89,13 @@ with st.sidebar:
     st.divider()
 
     if st.button("Home Page"):
-        st.query_params.update({
-            "user": username,
-            "page": "Home Page"
-        })
+        navigate("Home Page")
 
     if st.button("Summary"):
-        st.query_params.update({
-            "user": username,
-            "page": "Summary"
-        })
+        navigate("Summary")
 
     if st.button("Detailed"):
-        st.query_params.update({
-            "user": username,
-            "page": "Detailed"
-        })
+        navigate("Detailed")
 
 # ====================================================
 # ==================== HOME PAGE =====================
