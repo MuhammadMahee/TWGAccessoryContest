@@ -107,7 +107,7 @@ else:
             display:block;
             text-align:center;
             padding:0.75rem;
-            background-color:transparent;
+            background-color:light-grey;
             color:white;
             text-decoration:none;
             border-radius:8px;
