@@ -117,7 +117,7 @@ else:
         "
         onmouseover="this.style.backgroundColor='var(--secondary-background-color)';"
         onmouseout="this.style.backgroundColor='var(--primary-background-color)';">
-            Open Accessory Dashboard
+            Open Report
         </a>
         """,
         unsafe_allow_html=True
