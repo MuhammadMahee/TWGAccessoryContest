@@ -52,14 +52,14 @@ if not st.session_state.logged_in:
         """
         <div style="text-align:center; margin-top:120px;">
             <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
-            <h2>Reports Login</h2>
+            <h2>Login with TWG!</h2>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    selected_user = st.selectbox("Select Username", usernames)
-    entered_code = st.text_input("Enter Code", type="password")
+    selected_user = st.selectbox("Enter Your NTID", usernames)
+    entered_code = st.text_input("Enter Password", type="password")
 
     if st.button("Login"):
         actual_code = codes_df.loc[
