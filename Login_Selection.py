@@ -92,18 +92,18 @@ else:
     )
 
 
-    if st.button(""):
-        base_url = REPORTS[selected_report]
-        token = generate_token(st.session_state.username)
-        final_url = f"{base_url}?token={token}"
 
-        st.success("Login successful")
+    base_url = REPORTS[selected_report]
+    token = generate_token(st.session_state.username)
+    final_url = f"{base_url}?token={token}"
 
-        st.link_button(
-            "Open Accessory Dashboard",
-            final_url,
-            use_container_width=True
-        )
+    st.success("Login successful")
+
+    st.link_button(
+        "Open Accessory Dashboard",
+        final_url,
+        use_container_width=True
+    )
 
     st.divider()
 
