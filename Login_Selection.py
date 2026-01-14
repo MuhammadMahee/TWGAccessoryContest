@@ -1,5 +1,20 @@
 import streamlit as st
 import pandas as pd
+import hmac
+import hashlib
+import time
+
+SHARED_SECRET = "TWG_ACCESSORY_BONUS_2026_SECURE"
+
+def generate_token(username):
+    timestamp = str(int(time.time()))
+    message = f"{username}|{timestamp}"
+    signature = hmac.new(
+        SHARED_SECRET.encode(),
+        message.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    return f"{message}|{signature}"
 
 # ---------------- CONFIG ----------------
 CODES_FILE = "IDM_User_Codes.xlsx"
@@ -77,7 +92,8 @@ else:
 
     if st.button("Open Report"):
         base_url = REPORTS[selected_report]
-        final_url = f"{base_url}?user={st.session_state.username}"  # FIXED: use ?user=
+        token = generate_token(st.session_state.username)
+        final_url = f"{base_url}?token={token}"
         st.markdown(
             f"<meta http-equiv='refresh' content='0; url={final_url}'>",
             unsafe_allow_html=True

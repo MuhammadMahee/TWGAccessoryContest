@@ -1,13 +1,57 @@
 import streamlit as st
 import pandas as pd
 from datetime import date, datetime
+import hmac
+import hashlib
+import time
+
+def navigate(page_name):
+    st.query_params["page"] = page_name
+    st.rerun()
+
+SHARED_SECRET = "TWG_ACCESSORY_BONUS_2026_SECURE"
+
+def validate_token(token):
+    try:
+        username, timestamp, signature = token.split("|")
+
+        message = f"{username}|{timestamp}"
+
+        expected_signature = hmac.new(
+            SHARED_SECRET.encode(),
+            message.encode(),
+            hashlib.sha256
+        ).hexdigest()
+
+        # Signature check
+        if not hmac.compare_digest(signature, expected_signature):
+            return None
+
+        # Token expiry (10 minutes)
+        if time.time() - int(timestamp) > 600:
+            return None
+
+        return username
+
+    except Exception:
+        return None
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Accessory Contest Dashboard", layout="wide")
 
 # ---------------- QUERY PARAMS ----------------
 qp = st.query_params
-username = qp.get("user", "Admin")
+token = st.query_params.get("token")
+
+if not token:
+    st.error("Unauthorized access.")
+    st.stop()
+
+username = validate_token(token)
+
+if not username:
+    st.error("Session expired or invalid access.")
+    st.stop()
 page = qp.get("page", "Home Page")
 
 # ---------------- DATE LOGIC ----------------
