@@ -5,6 +5,8 @@ import hmac
 import hashlib
 import time
 
+LOGOUT_URL = "https://totallywirelessgroup.streamlit.app/"
+
 def navigate(page_name):
     st.query_params["page"] = page_name
     st.rerun()
@@ -96,6 +98,31 @@ with st.sidebar:
 
     if st.button("Detailed"):
         navigate("Detailed")
+
+    # Logout button (same tab redirect)
+    st.markdown(
+        f"""
+        <button 
+            onclick="window.location.href='{LOGOUT_URL}';" 
+            style="
+                width:100%;
+                padding:0.65rem;
+                font-weight:600;
+                border:1px solid #D3D3D3;
+                border-radius:8px;
+                background-color: var(--primary-background-color);
+                color: var(--text-color);
+                cursor:pointer;
+                transition: all 0.2s ease;
+            "
+            onmouseover="this.style.backgroundColor='var(--secondary-background-color)';"
+            onmouseout="this.style.backgroundColor='var(--primary-background-color)';"
+        >
+            Logout
+        </button>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ====================================================
 # ==================== HOME PAGE =====================
