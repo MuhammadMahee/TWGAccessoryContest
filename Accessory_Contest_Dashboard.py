@@ -90,53 +90,16 @@ with st.sidebar:
     st.markdown(f"**{username}**")
     st.divider()
 
-    # Styled buttons using navigate()
-    button_style = """
-        <style>
-        .nav-btn {
-            display: block;
-            text-align: center;
-            padding: 0.65rem;
-            font-weight: 600;
-            border: 1px solid #D3D3D3;
-            border-radius: 8px;
-            background-color: var(--primary-background-color);
-            color: var(--text-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 0.5rem;
-        }
-        .nav-btn:hover {
-            background-color: var(--secondary-background-color);
-        }
-        </style>
-    """
-    st.markdown(button_style, unsafe_allow_html=True)
-
-    if st.button("Home Page", key="btn_home"):
+    if st.button("Home Page"):
         navigate("Home Page")
-        st.rerun()
-        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
 
-    if st.button("Summary", key="btn_summary"):
+    if st.button("Summary"):
         navigate("Summary")
-        st.rerun()
-        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
 
-    if st.button("Detailed", key="btn_detailed"):
+    if st.button("Detailed"):
         navigate("Detailed")
-        st.rerun()
-        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
 
     st.divider()
-
-    # Logout button (same tab redirect)
-    st.link_button(
-        "Open Report",
-        LOGOUT_URL,
-        use_container_width=True
-    )
-
 # ====================================================
 # ==================== HOME PAGE =====================
 # ====================================================
