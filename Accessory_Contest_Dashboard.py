@@ -90,30 +90,49 @@ with st.sidebar:
     st.markdown(f"**{username}**")
     st.divider()
 
-    # Navigation buttons using link_button
-    st.link_button(
-        "Home Page",
-        url=f"?page=Home Page",
-        use_container_width=True
-    )
+    # Styled buttons using navigate()
+    button_style = """
+        <style>
+        .nav-btn {
+            display: block;
+            text-align: center;
+            padding: 0.65rem;
+            font-weight: 600;
+            border: 1px solid #D3D3D3;
+            border-radius: 8px;
+            background-color: var(--primary-background-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+        .nav-btn:hover {
+            background-color: var(--secondary-background-color);
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
 
-    st.link_button(
-        "Summary",
-        url=f"?page=Summary",
-        use_container_width=True
-    )
+    if st.button("Home Page", key="btn_home"):
+        navigate("Home Page")
+        st.rerun()
+        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
 
-    st.link_button(
-        "Detailed",
-        url=f"?page=Detailed",
-        use_container_width=True
-    )
+    if st.button("Summary", key="btn_summary"):
+        navigate("Summary")
+        st.rerun()
+        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
+
+    if st.button("Detailed", key="btn_detailed"):
+        navigate("Detailed")
+        st.rerun()
+        st.markdown("<div class='nav-btn'></div>", unsafe_allow_html=True)
 
     st.divider()
 
     # Logout button (same tab redirect)
     st.link_button(
-        "Log Out",
+        "Open Report",
         LOGOUT_URL,
         use_container_width=True
     )
