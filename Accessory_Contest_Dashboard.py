@@ -306,4 +306,10 @@ elif page == "Detailed":
                 (filtered_df["adddate"] <= end_date)
             ]
 
+        # Format adddate column for display
+        if "adddate" in filtered_df.columns:
+            filtered_df = filtered_df.copy()
+            filtered_df["adddate"] = pd.to_datetime(filtered_df["adddate"])
+            filtered_df["adddate"] = filtered_df["adddate"].dt.strftime("%m/%d/%Y %I:%M %p")
+
         st.dataframe(filtered_df, use_container_width=True)
