@@ -98,7 +98,8 @@ with st.sidebar:
 
     if st.button("Detailed"):
         navigate("Detailed")
-        st.divider()
+        
+    st.divider()
 
     # Logout button (same tab redirect)
     st.link_button(
