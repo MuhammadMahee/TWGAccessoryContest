@@ -263,7 +263,7 @@ elif page == "Detailed":
     filtered_df = get_user_df()
 
     # Keep only selected columns
-    columns_to_display = [col for col in df.columns if col != "Date"]  # or "adddate" if needed
+    columns_to_display = df.columns
     filtered_df = filtered_df.loc[:, filtered_df.columns.intersection(columns_to_display)]
 
     if filtered_df.empty:
