@@ -3,6 +3,9 @@ import pandas as pd
 from datetime import date, datetime
 import hmac
 import hashlib
+import openpyxl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Alignment
 import io
 import time
 
@@ -225,7 +228,7 @@ elif page == "Summary":
             )
 
             summary_df = summary_df[
-                (summary_df["Date"] >= start_date) & 
+                (summary_df["Date"] >= start_date) &
                 (summary_df["Date"] <= end_date)
             ]
 
@@ -244,7 +247,6 @@ elif page == "Summary":
 
         bonus = total_profit * bonus_pct
 
-        # ---------------- METRICS ----------------
         c1, c2, c3 = st.columns(3)
         c1.metric("Total Qty", total_qty)
         c2.metric("Total Accessory", f"${total_accessory:,.2f}")
@@ -255,34 +257,83 @@ elif page == "Summary":
         c5.metric("Bonus %", f"{bonus_pct*100:.0f}%")
         c6.metric("Bonus", f"${bonus:,.2f}")
 
-        # ---------------- DOWNLOAD BUTTON ----------------
-        # Prepare the DataFrame to export
-        export_df = pd.DataFrame({
-            "marketid": summary_df["marketid"],
-            "company": summary_df["company"],
-            "adduser": summary_df["adduser"],
-            "Fullname": summary_df["Fullname"],
-            "Total Qty": total_qty,
-            "Total Accessory": total_accessory,
-            "Total Profit": total_profit,
+# ================= DOWNLOAD BUTTON =================
+# Function to prepare summary data based on current filtered_df
+def prepare_export(df):
+    export_rows = []
+
+    # Group by user & fullname to calculate totals
+    grouped = df.groupby(["adduser", "Fullname", "marketid", "company"], as_index=False).agg(
+        Total_Qty=("qty", "sum"),
+        Total_Accessory=("Accessory", "sum"),
+        Total_Profit=("Profit", "sum")
+    )
+
+    for _, row in grouped.iterrows():
+        # Determine tier and bonus %
+        acc = row["Total_Accessory"]
+        profit = row["Total_Profit"]
+
+        if acc <= 2999:
+            tier, bonus_pct = "Tier 1", 0.08
+        elif acc <= 5999:
+            tier, bonus_pct = "Tier 2", 0.10
+        elif acc <= 9999:
+            tier, bonus_pct = "Tier 3", 0.15
+        else:
+            tier, bonus_pct = "Tier 4", 0.17
+
+        bonus = profit * bonus_pct
+
+        export_rows.append({
+            "marketid": row["marketid"],
+            "company": row["company"],
+            "adduser": row["adduser"],
+            "Fullname": row["Fullname"],
+            "Total Qty": row["Total_Qty"],
+            "Total Accessory": row["Total_Accessory"],
+            "Total Profit": row["Total_Profit"],
             "Tier": tier,
             "Bonus %": f"{bonus_pct*100:.0f}%",
-            "Bonus": bonus
-        }, index=[0])  # index=[0] to create a single-row DataFrame for metrics
+            "Bonus": round(bonus, 2)
+        })
 
-        # Add button for downloading
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-            export_df.to_excel(writer, index=False, sheet_name="Summary")
-            writer.save()
-            processed_data = output.getvalue()
+    return export_rows
 
-        st.download_button(
-            label="Download Summary",
-            data=processed_data,
-            file_name=f"Accessory_Summary_{THIS_MONTH_LABEL}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+# Prepare filtered export data
+export_data = prepare_export(summary_df)
+
+# Create workbook
+wb = openpyxl.Workbook()
+ws = wb.active
+ws.title = "Summary"
+
+# Write headers
+if export_data:
+    headers = list(export_data[0].keys())
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.font = Font(bold=True)
+        cell.alignment = Alignment(horizontal="center")
+
+    # Write data rows
+    for row_num, row_data in enumerate(export_data, 2):
+        for col_num, header in enumerate(headers, 1):
+            ws.cell(row=row_num, column=col_num, value=row_data[header])
+            ws.column_dimensions[get_column_letter(col_num)].width = max(15, len(header)+2)
+
+# Save to bytes buffer
+output = io.BytesIO()
+wb.save(output)
+output.seek(0)
+
+# Streamlit download button
+st.download_button(
+    label="Download Summary",
+    data=output,
+    file_name=f"Accessory_Summary_{THIS_MONTH_LABEL}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
 
 # ====================================================
 # ==================== DETAILED ======================
