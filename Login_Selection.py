@@ -102,23 +102,25 @@ else:
 
     st.markdown(
         f"""
-        <a href="{final_url}" target="_self"
-        style="
-            display:block;
-            text-align:center;
-            padding:0.65rem;
+        <style>
+        .report-btn {{
+            display: block;
+            text-align: center;
+            padding: 0.65rem;
             background-color: var(--primary-background-color);
             color: var(--text-color);
-            text-decoration:none;
-            border-radius:8px;
-            font-weight:600;
-            border:1px solid #D3D3D3;  /* Light grey border */
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid #D3D3D3; /* Light grey border */
             transition: all 0.2s ease;
-        "
-        onmouseover="this.style.backgroundColor='var(--secondary-background-color)';"
-        onmouseout="this.style.backgroundColor='var(--primary-background-color)';">
-            Open Report
-        </a>
+            margin: 0 auto;
+        }}
+        .report-btn:hover {{
+            background-color: var(--secondary-background-color);
+        }}
+        </style>
+        <a href="{final_url}" target="_self" class="report-btn">Open Report</a>
         """,
         unsafe_allow_html=True
     )
