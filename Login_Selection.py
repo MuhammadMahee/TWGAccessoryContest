@@ -51,7 +51,7 @@ if not st.session_state.logged_in:
     st.markdown(
         """
         <div style="text-align:center; margin-top:120px;">
-            <h1>TWG | Totally Wireless Group</h1>
+            <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
             <h2>Reports Login</h2>
         </div>
         """,
