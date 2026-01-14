@@ -98,8 +98,7 @@ else:
     token = generate_token(st.session_state.username)
     final_url = f"{base_url}?token={token}"
 
-    st.success("Login successful")
-
+    # Button styled as link (same tab, light grey border, hover)
     st.markdown(
         f"""
         <style>
