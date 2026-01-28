@@ -248,9 +248,11 @@ elif page == "Summary":
             tier, bonus_pct = "Tier 4", 0.17
 
         # ---------------- ADMIN AGGREGATE MODE ----------------
+        # Admin is in aggregate mode only if ALL NTIDs and ALL Fullnames selected
         admin_aggregate_view = (
             username == "Admin"
             and selected_ntid == "All"
+            and selected_name == "All"
         )
 
         if admin_aggregate_view:
@@ -298,7 +300,7 @@ elif page == "Summary":
         c4.metric("Tier", tier_display)
         c5.metric("Bonus %", bonus_pct_display)
         c6.metric("Bonus", bonus_display)
-
+        
         # ================= DOWNLOAD BUTTON =================
         # Function to prepare summary data based on current filtered_df
         def prepare_export(df):
