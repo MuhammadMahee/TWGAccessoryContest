@@ -232,65 +232,66 @@ elif page == "Summary":
                 (summary_df["Date"] <= end_date)
             ]
 
-        # ---------------- CALCULATIONS ----------------
-        total_qty = summary_df["qty"].sum()
-        total_accessory = summary_df["Accessory"].sum()
-        total_profit = summary_df["Profit"].sum()
+            # ---------------- CALCULATIONS ----------------
+            total_qty = summary_df["qty"].sum()
+            total_accessory = summary_df["Accessory"].sum()
+            total_profit = summary_df["Profit"].sum()
 
-        # Tier logic (used for employees only)
-        if total_accessory <= 2999:
-            tier, bonus_pct = "Tier 1", 0.08
-        elif total_accessory <= 5999:
-            tier, bonus_pct = "Tier 2", 0.10
-        elif total_accessory <= 9999:
-            tier, bonus_pct = "Tier 3", 0.15
-        else:
-            tier, bonus_pct = "Tier 4", 0.17
+            # Tier logic
+            if total_accessory <= 2999:
+                tier, bonus_pct = "Tier 1", 0.08
+            elif total_accessory <= 5999:
+                tier, bonus_pct = "Tier 2", 0.10
+            elif total_accessory <= 9999:
+                tier, bonus_pct = "Tier 3", 0.15
+            else:
+                tier, bonus_pct = "Tier 4", 0.17
 
-        # ---------------- ADMIN BONUS OVERRIDE ----------------
-        if username == "Admin":
+            # ---------------- ADMIN BONUS OVERRIDE ----------------
+            # Admin override ONLY when viewing ALL users
+            if username == "Admin" and selected_ntid == "All":
 
-            emp_group = summary_df.groupby("adduser", as_index=False).agg(
-                Total_Accessory=("Accessory", "sum"),
-                Total_Profit=("Profit", "sum")
-            )
+                emp_group = summary_df.groupby("adduser", as_index=False).agg(
+                    Total_Accessory=("Accessory", "sum"),
+                    Total_Profit=("Profit", "sum")
+                )
 
-            def calc_bonus(acc, profit):
-                if acc <= 2999:
-                    pct = 0.08
-                elif acc <= 5999:
-                    pct = 0.10
-                elif acc <= 9999:
-                    pct = 0.15
-                else:
-                    pct = 0.17
-                return profit * pct
+                def calc_bonus(acc, profit):
+                    if acc <= 2999:
+                        pct = 0.08
+                    elif acc <= 5999:
+                        pct = 0.10
+                    elif acc <= 9999:
+                        pct = 0.15
+                    else:
+                        pct = 0.17
+                    return profit * pct
 
-            emp_group["Bonus"] = emp_group.apply(
-                lambda r: calc_bonus(r["Total_Accessory"], r["Total_Profit"]),
-                axis=1
-            )
+                emp_group["Bonus"] = emp_group.apply(
+                    lambda r: calc_bonus(r["Total_Accessory"], r["Total_Profit"]),
+                    axis=1
+                )
 
-            bonus_display = f"${emp_group['Bonus'].sum():,.2f}"
-            bonus_pct_display = "-"
-            tier_display = "-"
+                bonus_display = f"${emp_group['Bonus'].sum():,.2f}"
+                bonus_pct_display = "-"
+                tier_display = "-"
 
-        else:
-            bonus = total_profit * bonus_pct
-            bonus_display = f"${bonus:,.2f}"
-            bonus_pct_display = f"{bonus_pct*100:.0f}%"
-            tier_display = tier
+            else:
+                bonus = total_profit * bonus_pct
+                bonus_display = f"${bonus:,.2f}"
+                bonus_pct_display = f"{bonus_pct*100:.0f}%"
+                tier_display = tier
 
-        # ---------------- METRICS DISPLAY ----------------
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Total Qty", total_qty)
-        c2.metric("Total Accessory", f"${total_accessory:,.2f}")
-        c3.metric("Total Profit", f"${total_profit:,.2f}")
+            # ---------------- METRICS DISPLAY ----------------
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Total Qty", total_qty)
+            c2.metric("Total Accessory", f"${total_accessory:,.2f}")
+            c3.metric("Total Profit", f"${total_profit:,.2f}")
 
-        c4, c5, c6 = st.columns(3)
-        c4.metric("Tier", tier_display)
-        c5.metric("Bonus %", bonus_pct_display)
-        c6.metric("Bonus", bonus_display)
+            c4, c5, c6 = st.columns(3)
+            c4.metric("Tier", tier_display)
+            c5.metric("Bonus %", bonus_pct_display)
+            c6.metric("Bonus", bonus_display)
 
         # ================= DOWNLOAD BUTTON =================
         # Function to prepare summary data based on current filtered_df
