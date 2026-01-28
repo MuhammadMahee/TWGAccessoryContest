@@ -297,10 +297,10 @@ elif page == "Summary":
         c3.metric("Total Profit", f"${total_profit:,.2f}")
 
         c4, c5, c6 = st.columns(3)
-        c4.metric("Tier", tier_display)
-        c5.metric("Bonus %", bonus_pct_display)
+        c4.metric("Tier", str(tier_display))           # <-- force string
+        c5.metric("Bonus %", str(bonus_pct_display))  # <-- force string
         c6.metric("Bonus", bonus_display)
-        
+
         # ================= DOWNLOAD BUTTON =================
         # Function to prepare summary data based on current filtered_df
         def prepare_export(df):
