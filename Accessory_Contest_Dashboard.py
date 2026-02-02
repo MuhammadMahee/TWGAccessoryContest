@@ -128,14 +128,6 @@ if page == "Home Page":
         index=0  # default = latest month
     )
 
-    selected_month = available_months.loc[
-        available_months["Month_Label"] == selected_month_label,
-        "Month"
-    ].iloc[0]
-
-    # Filter data for selected month
-    home_df = df[df["Month"] == selected_month].copy()
-
     st.markdown(
         f"""
         <div style="text-align:left;">
