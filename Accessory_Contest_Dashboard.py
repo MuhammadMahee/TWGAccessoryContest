@@ -148,6 +148,25 @@ if page == "Home Page":
         unsafe_allow_html=True
     )
 
+    # ================= MONTH FILTER (BELOW TITLE) =================
+    col1, col2, col3 = st.columns([1.2, 4, 4])  # narrow left column
+
+    with col1:
+        selected_month_label = st.selectbox(
+            "Select Month",
+            month_labels,
+            index=0
+        )
+
+    # Map label → period
+    selected_month = available_months.loc[
+        available_months["Month_Label"] == selected_month_label,
+        "Month"
+    ].iloc[0]
+
+    # Filter data
+    home_df = df[df["Month"] == selected_month].copy()
+
     if home_df.empty:
         st.info("No data available to calculate bonuses.")
     else:
