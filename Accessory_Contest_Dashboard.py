@@ -109,24 +109,44 @@ with st.sidebar:
 # ====================================================
 if page == "Home Page":
 
+    df["Month"] = pd.to_datetime(df["adddate"], errors="coerce").dt.to_period("M")
+    df["Month_Label"] = df["Month"].dt.strftime("%b-%y")
+
+    # ================= MONTH FILTER =================
+    available_months = (
+        df[["Month", "Month_Label"]]
+        .dropna()
+        .drop_duplicates()
+        .sort_values("Month", ascending=False)
+    )
+
+    month_labels = available_months["Month_Label"].tolist()
+
+    selected_month_label = st.selectbox(
+        "Select Month",
+        month_labels,
+        index=0  # default = latest month
+    )
+
+    selected_month = available_months.loc[
+        available_months["Month_Label"] == selected_month_label,
+        "Month"
+    ].iloc[0]
+
+    # Filter data for selected month
+    home_df = df[df["Month"] == selected_month].copy()
+
     st.markdown(
         f"""
         <div style="text-align:left;">
             <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
             <h2>Welcome to Accessory Bonus Dashboard!</h2>
-            <h3><strong>Top 5 Employees by Bonus – {THIS_MONTH_LABEL}</strong></h3>
+            <h3><strong>Top 5 Employees by Bonus – {selected_month_label}</strong></h3>
             <h3><strong></strong></h3>
         </div>
         """,
         unsafe_allow_html=True
     )
-
-    home_df = df.copy()
-
-    home_df = home_df[
-    (home_df["Date"] >= THIS_MONTH_START) &
-    (home_df["Date"] <= THIS_MONTH_END)
-]
 
     if home_df.empty:
         st.info("No data available to calculate bonuses.")
