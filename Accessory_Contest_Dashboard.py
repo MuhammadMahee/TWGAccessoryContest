@@ -112,7 +112,7 @@ if page == "Home Page":
     df["Month"] = pd.to_datetime(df["adddate"], errors="coerce").dt.to_period("M")
     df["Month_Label"] = df["Month"].dt.strftime("%b-%y")
 
-    # ================= MONTH FILTER =================
+    # ================= MONTH OPTIONS =================
     available_months = (
         df[["Month", "Month_Label"]]
         .dropna()
@@ -122,26 +122,19 @@ if page == "Home Page":
 
     month_labels = available_months["Month_Label"].tolist()
 
-    selected_month_label = st.selectbox(
-        "Select Month",
-        month_labels,
-        index=0  # default = latest month
-    )
-
+    # ================= HEADER =================
     st.markdown(
-        f"""
+        """
         <div style="text-align:left;">
             <h1>TWG | TOTALLY WIRELESS GROUP |</h1>
             <h2>Welcome to Accessory Bonus Dashboard!</h2>
-            <h3><strong>Top 5 Employees by Bonus – {selected_month_label}</strong></h3>
-            <h3><strong></strong></h3>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ================= MONTH FILTER (BELOW TITLE) =================
-    col1, col2, col3 = st.columns([1.2, 4, 4])  # narrow left column
+    # ================= MONTH FILTER (BELOW HEADER) =================
+    col1, col2, col3 = st.columns([1.2, 4, 4])
 
     with col1:
         selected_month_label = st.selectbox(
@@ -150,13 +143,18 @@ if page == "Home Page":
             index=0
         )
 
-    # Map label → period
+    # ================= SUBTITLE =================
+    st.markdown(
+        f"<h3><strong>Top 5 Employees by Bonus – {selected_month_label}</strong></h3>",
+        unsafe_allow_html=True
+    )
+
+    # ================= FILTER DATA =================
     selected_month = available_months.loc[
         available_months["Month_Label"] == selected_month_label,
         "Month"
     ].iloc[0]
 
-    # Filter data
     home_df = df[df["Month"] == selected_month].copy()
 
     if home_df.empty:
