@@ -1,5 +1,5 @@
 cookie = {
-    "FW_SessionID": "2222696EL05",
-    "sec85952EAF_id": "Twg.dev",
-    "sec85952EAF_pd": "BD10AF16"
+    "FW_SessionID": "642723VGD02",
+    "sec85952EAF_id": "twg.dev",
+    "sec85952EAF_pd": "BEC61796"
 }
