@@ -1,5 +1,3 @@
-cookie = {
-    "FW_SessionID": "642723VGD02",
-    "sec85952EAF_id": "twg.dev",
-    "sec85952EAF_pd": "BEC61796"
-}
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Creds"))
+from creds import COOKIES as cookie

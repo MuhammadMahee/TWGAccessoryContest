@@ -1,4 +1,4 @@
-import requests
+﻿import requests
 from concurrent.futures import ThreadPoolExecutor
 
 url = "https://www.myrtpos.com/newbdi/TimePunches.fwx"
@@ -15,7 +15,7 @@ payload = {
 }
 
 cookies = {
-    "FW_SessionID": "642723VGD02",
+    "FW_SessionID": "03107816S06",
     "sec85952EAF_id": "twg.dev",
     "sec85952EAF_pd": "BEC61796"
 }

@@ -25,6 +25,7 @@ KPI_TABLE = "KPIs"
 EMP_KPI_TABLE = "emp_kpis"
 TIME_PUNCH_TABLE = "TimePunches_Raw"
 TIME_PUNCH_PIVOT_TABLE = "TimePunches_Pivot"
+SAME_DAY_SPIFF_TABLE = "same_day_spiff_sales"
 
 BASE_FOLDER = r"C:\Users\Administrator\OneDrive\Accessory_Contest_Dashboard\Sales_Detailed_Exclude_BP"
 
@@ -281,6 +282,52 @@ def process_data(df):
     return acc_detail
 
 
+def build_same_day_spiff_table(df):
+    columns = ["report_date", "marketid", "company", "mim_count", "hint_count"]
+    if df.empty:
+        print("[SDS] Source DataFrame is empty. Skipping Same Day Spiff build")
+        return pd.DataFrame(columns=columns)
+
+    required = {"adddate", "marketid", "company", "item", "category", "qty"}
+    missing = sorted(required - set(df.columns))
+    if missing:
+        print(f"[SDS] Missing required Sales Detailed columns: {', '.join(missing)}")
+        return pd.DataFrame(columns=columns)
+
+    working = df.copy()
+    working["report_date"] = pd.to_datetime(working["adddate"], errors="coerce").dt.date
+    working["marketid"] = working["marketid"].fillna("").astype(str).str.strip()
+    working["company"] = working["company"].fillna("").astype(str).str.strip()
+    working["qty"] = pd.to_numeric(working["qty"], errors="coerce").fillna(0)
+
+    item_upper = working["item"].fillna("").astype(str).str.strip().str.upper()
+    category_upper = working["category"].fillna("").astype(str).str.strip().str.upper()
+    working["mim_count"] = working["qty"].where(item_upper == "MIM", 0)
+    working["hint_count"] = working["qty"].where(category_upper == "HINT", 0)
+    working = working[
+        working["report_date"].notna()
+        & (working["marketid"] != "")
+        & (working["company"] != "")
+        & ((working["mim_count"] != 0) | (working["hint_count"] != 0))
+    ].copy()
+
+    if working.empty:
+        print("[SDS] No MIM item or HINT category rows found")
+        return pd.DataFrame(columns=columns)
+
+    result = (
+        working.groupby(["report_date", "marketid", "company"], dropna=False)[["mim_count", "hint_count"]]
+        .sum()
+        .reset_index()
+        .sort_values(["report_date", "marketid", "company"])
+        .reset_index(drop=True)
+    )
+    result["mim_count"] = result["mim_count"].round().astype(int)
+    result["hint_count"] = result["hint_count"].round().astype(int)
+    print(f"[SDS] Same Day Spiff history ready with {len(result)} Date/store rows")
+    return result[columns]
+
+
 def build_kpi_table(df, acc_detail):
     key_columns = ["Date", "marketid", "custno", "company"]
 
@@ -463,11 +510,13 @@ if __name__ == "__main__":
             df = fetch_accessory_data()
             time_punch_df = fetch_time_punch_data()
             acc_detail = process_data(df)
+            same_day_spiff = build_same_day_spiff_table(df)
             KPI = build_kpi_table(df, acc_detail)
             emp_kpi = build_emp_kpi_table(df, acc_detail)
             time_punch_pivot = build_time_punch_pivot(time_punch_df)
 
             accessory_exported = save_to_mysql(acc_detail)
+            same_day_spiff_exported = save_table_to_mysql(same_day_spiff, SAME_DAY_SPIFF_TABLE)
             kpi_exported = save_table_to_mysql(KPI, KPI_TABLE)
             emp_kpi_exported = save_table_to_mysql(emp_kpi, EMP_KPI_TABLE)
             time_punch_exported = save_table_to_mysql(time_punch_df, TIME_PUNCH_TABLE)
@@ -475,6 +524,7 @@ if __name__ == "__main__":
 
             if (
                 not accessory_exported
+                or not same_day_spiff_exported
                 or not kpi_exported
                 or not emp_kpi_exported
                 or not time_punch_exported
@@ -486,6 +536,7 @@ if __name__ == "__main__":
             print(
                 f"[{datetime.now()}] Refresh cycle completed successfully: "
                 f"{DB_TABLE}={len(acc_detail)} rows, {KPI_TABLE}={len(KPI)} rows, "
+                f"{SAME_DAY_SPIFF_TABLE}={len(same_day_spiff)} rows, "
                 f"{EMP_KPI_TABLE}={len(emp_kpi)} rows, "
                 f"{TIME_PUNCH_TABLE}={len(time_punch_df)} rows, {TIME_PUNCH_PIVOT_TABLE}={len(time_punch_pivot)} rows"
             )
